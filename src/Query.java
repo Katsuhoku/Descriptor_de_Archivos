@@ -11,7 +11,7 @@
     Baéz González José, 201657079
     Bautista Otero Alexandra, 
     Coria RIos Marco Antonio, 201734576
-    Hernández Ramos Ängel, 201653224
+    Hernández Ramos Ángel, 201653224
     Torres Pérez Daniel, 201733939
 
     Clase: Query
