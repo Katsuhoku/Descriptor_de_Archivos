@@ -9,8 +9,8 @@
 
     Equipo:
     Baéz González José, 201657079
-    Bautista Otero Alexandra, 
-    Coria RIos Marco Antonio, 201734576
+    Bautista Otero Alexandra, 201640295
+    Coria Rios Marco Antonio, 201734576
     Hernández Ramos Ángel, 201653224
     Torres Pérez Daniel, 201733939
 
@@ -26,6 +26,8 @@ package src;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainWindow extends JFrame {
     // Atributos de la ventana
@@ -46,19 +48,35 @@ public class MainWindow extends JFrame {
 
     private JTextArea tableArea; // área de texto donde se mostrará la tabla seleccionada
 
+    private int minsalary;
+    private int maxsalary;
+
+    private final Color rwc = new Color(237, 78, 216);
+    private final Color bgc = new Color(47, 52, 56);
+
     // Constructor
-    // Inicializa la ventana y sus componentes
     public MainWindow() {
         q = new Query();
+    }
 
-        setTitle("BETWEEN Query");
+    // Empieza la ejecución del programa
+    public void start() {
+        try {
+            q.importTable("employees.txt");
+        }
+        catch (IOException ioe) {
+            JOptionPane.showMessageDialog(this, "No se pudo encontrar la tabla 'employee.txt'", "Error al cargar la Tabla", JOptionPane.ERROR_MESSAGE);
+            exit();
+        }
+
+        setTitle("Consulta");
         setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
         setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
         setLocationRelativeTo(null);
 
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent evt) {
-                System.exit(0);
+                exit();
             }
         });
 
@@ -123,20 +141,44 @@ public class MainWindow extends JFrame {
         
         // Los campos de texto se agregan entre una etiqueta que muestra cómo se escribiría
         // la consulta completa en el lenguaje SQL
-        pageStartPanel.add(new JLabel("SELECT last_name, salary FROM employee WHERE salary BETWEEN "));
+        JLabel selectLabel = new JLabel("SELECT ");
+        selectLabel.setForeground(rwc);
+        JLabel attribLabel = new JLabel("last_name, salary ");
+        attribLabel.setForeground(Color.WHITE);
+        JLabel fromLabel = new JLabel("FROM ");
+        fromLabel.setForeground(rwc);
+        JLabel employeesLabel = new JLabel("employees ");
+        employeesLabel.setForeground(Color.WHITE);
+        JLabel whereLabel = new JLabel("WHERE ");
+        whereLabel.setForeground(rwc);
+        JLabel salaryLabel = new JLabel("salary ");
+        salaryLabel.setForeground(Color.WHITE);
+        JLabel betweenLabel = new JLabel("BETWEEN ");
+        betweenLabel.setForeground(rwc);
+        JLabel andLabel = new JLabel("AND ");
+        andLabel.setForeground(rwc);
+        JLabel semicolonLabel = new JLabel(";  ");
+        semicolonLabel.setForeground(Color.WHITE);
+        pageStartPanel.add(selectLabel);
+        pageStartPanel.add(attribLabel);
+        pageStartPanel.add(fromLabel);
+        pageStartPanel.add(employeesLabel);
+        pageStartPanel.add(whereLabel);
+        pageStartPanel.add(salaryLabel);
+        pageStartPanel.add(betweenLabel);
         pageStartPanel.add(minsalaryField);
-        pageStartPanel.add(new JLabel(" AND "));
+        pageStartPanel.add(andLabel);
         pageStartPanel.add(maxsalaryField);
-        pageStartPanel.add(new JLabel(" ; "));
+        pageStartPanel.add(semicolonLabel);
         pageStartPanel.add(processButton);
-        pageStartPanel.setBackground(new Color(201, 245, 169));
+        pageStartPanel.setBackground(bgc);
 
         mainPanel.add(pageStartPanel, BorderLayout.PAGE_START);
 
         // Área de texto para mostrar la tabla seleccionada
         tableArea = new JTextArea();
         tableArea.setEditable(false);
-        tableArea.setFont(new Font("Consolas", Font.PLAIN, 15));
+        tableArea.setFont(new Font("Consolas", Font.PLAIN, 13));
 
          // Se introduce en un panel de barra de desplazamiento, para cuando la tabla supera el alto o ancho visible
          // en la pantalla
@@ -176,15 +218,15 @@ public class MainWindow extends JFrame {
         pageEndPanel.add(viewEmployeeTableButton);
         pageEndPanel.add(viewSelectionTableButton);
         pageEndPanel.add(viewProjectionTableButton);
-        pageEndPanel.setBackground(new Color(201, 245, 169));
+        pageEndPanel.setBackground(bgc);
 
         mainPanel.add(pageEndPanel, BorderLayout.PAGE_END);
 
         // Paneles auxiliares para dar espacio a los costados del área de la tabla
         JPanel lineStartPanel = new JPanel();
         JPanel lineEndPanel = new JPanel();
-        lineStartPanel.setBackground(new Color(201, 245, 169));
-        lineEndPanel.setBackground(new Color(201, 245, 169));
+        lineStartPanel.setBackground(bgc);
+        lineEndPanel.setBackground(bgc);
 
         mainPanel.add(lineStartPanel, BorderLayout.LINE_START);
         mainPanel.add(lineEndPanel, BorderLayout.LINE_END);
@@ -193,38 +235,52 @@ public class MainWindow extends JFrame {
         add(mainPanel);
     }
 
-    /* Acciones en Eventos */
+    // Termina la ejecución de todo el programa
+    private void exit() {
+        setVisible(false);
+        dispose();
+    
+        System.exit(0);
+    }
+
+
+    /* 
+        Acciones en Eventos
+    */
+
     // Procesa la consulta con los valores especificados (al presionar el botón de "Procesar")
     // El objeto "q" (de clase Query) genera las tablas correspondientes, solo si los límites son correctos
     // La consulta no se procesa si el límite superior es menor al límite inferior
     private void processQuery() {
-        int minsalary = Integer.parseInt(minsalaryField.getText());
-        int maxsalary = Integer.parseInt(maxsalaryField.getText());
+        minsalary = Integer.parseInt(minsalaryField.getText());
+        maxsalary = Integer.parseInt(maxsalaryField.getText());
 
         if (maxsalary < minsalary) {
-            showMessage("\tEl límite superior del salario debe ser mayor al límite inferior.");
+            JOptionPane.showMessageDialog(this, "El límite superior del salario debe ser mayor al límite inferior.", "Error", JOptionPane.WARNING_MESSAGE);
         }
         else {
-            q.between(minsalary, maxsalary);
             setTable(2); // Inicialmente, muestra la tabla final (selección y proyección)
         }
     }
 
     // Cambia la tabla que se despliega en el área designada
     private void setTable(int table) {
-        String header; // cabecera que muestra los nombres de los atributros que se despliegan en pantalla
+        Table result;
         switch (table) {
-            case 0: // muestra la tabla completa
-                header = "EmployeeID----FirstName--------------LastName------------------Email---------------PhoneNumer---HireDate-------JobID-------Salary-Com-ManID-DeptID";
-                tableArea.setText(header + "\n" + q.getEmployees());
+            case 0: // SELECT * FROM employees;
+                result = q.from("employees");
+                tableArea.setText(result.header() + "\n" + result.showAll());
                 break;
-            case 1: // muestra la tabla luego de la selección
-                header = "EmployeeID----FirstName--------------LastName------------------Email---------------PhoneNumer---HireDate-------JobID-------Salary-Com-ManID-DeptID";
-                tableArea.setText(header + "\n" + q.getSelectionTable());
+            case 1: // SELECT * FROM employees WHERE salary BETWEEN minsalary AND maxsalary;
+                result = q.between(q.from("employees"), minsalary, maxsalary);
+                tableArea.setText(result.header() + "\n" + result.showAll());
                 break;
-            case 2: // muestra la tabla luego de la selección y la proyección
-                header = "LastName\t\tSalary";
-                tableArea.setText(header + "\n" + q.getProjectionTable());
+            case 2: // SELECT last_name, salary FROM employees WHERE salary BETWEEN minsalary AND maxsalary;
+                ArrayList<String> attributes = new ArrayList<>();
+                attributes.add("last_name");
+                attributes.add("salary");
+                result = q.select(q.between(q.from("employees"), minsalary, maxsalary), attributes);
+                tableArea.setText(result.header() + "\n" + result.showAll());
                 break;
         }
         tableArea.setCaretPosition(0);
@@ -234,17 +290,14 @@ public class MainWindow extends JFrame {
         viewProjectionTableButton.setEnabled(true);
     }
 
-    // Muestra un mensaje de error
-    private void showMessage(String msg) {
-        tableArea.setText(msg);
-        viewEmployeeTableButton.setEnabled(false);
-        viewSelectionTableButton.setEnabled(false);
-        viewProjectionTableButton.setEnabled(false);
-    }
-
-    // Método main
-    // Ejecuta todo el programa
+    // Main
     public static void main(String[] args) {
         MainWindow window = new MainWindow();
+        window.start();
     }
+
+    /*
+     * ...Ignore...
+     */
+    private static final long serialVersionUID = 1L;
 }

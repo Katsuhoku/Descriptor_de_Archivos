@@ -9,10 +9,13 @@
 
     Equipo:
     Baéz González José, 201657079
-    Bautista Otero Alexandra, 
-    Coria RIos Marco Antonio, 201734576
+    Bautista Otero Alexandra, 201640295
+    Coria Rios Marco Antonio, 201734576
     Hernández Ramos Ángel, 201653224
     Torres Pérez Daniel, 201733939
+
+    Clase: TextFile
+    Descripción: Clase encargada de abrir y leer un archivo de texto cualquiera.
 */
 
 package src;

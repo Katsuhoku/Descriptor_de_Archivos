@@ -9,89 +9,85 @@
 
     Equipo:
     Baéz González José, 201657079
-    Bautista Otero Alexandra, 
-    Coria RIos Marco Antonio, 201734576
+    Bautista Otero Alexandra, 201640295
+    Coria Rios Marco Antonio, 201734576
     Hernández Ramos Ángel, 201653224
     Torres Pérez Daniel, 201733939
 
     Clase: Query
     Descripción: Clase encargada de procesar la consulta con los parámetros del usuario.
-    Almancena, en tres tablas distintas, cada uno de los resultados del proceso de la 
-    consulta paso a paso: obtención de la tabla completa, selección sobre la tabla completa y
-    proyección sobre la selección. Permite el retorno de estas tablas para su despliegue
-    en pantalla.
+    Almacena una base de datos (clase Database) que contiene todas las tablas necesarias para realizar las consultas.
+    Las funciones tratan de seguir la sintaxis del lenguaje SQL.
 */
 
 package src;
 
 // Bibliotecas
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class Query {
-    // Tablas de la consulta, paso a paso
-    private ArrayList<Employee> employees; // tabla completa
-    private ArrayList<Employee> selectionTable; // tabla de la selección sobre la tabla completa
-    private ArrayList<String> projectionTable; // tabla de la proyección sobre la selección
+    // Base de Datos
+    private Database db;
 
-    // Procesa la consulta con condicional BETWEEN, en el rango específicado por los
-    // límites en los parámetros
-    public void between(int minsalary, int maxsalary) {
-        TableReader tableReader = new TableReader(); // Lector de la tabla (utiliza el descriptor de archivos)
+    // Constrtuctor
+    public Query() {
+        db = new Database();
+    }
 
-        // Inicializa las 3 tablas
-        employees = new ArrayList<>();
-        selectionTable = new ArrayList<>();
-        projectionTable = new ArrayList<>();
+    // Carga una Tabla desde un archivo a la Base de Datos
+    public void importTable(String dbfilename) throws IOException {
+        db.addTable(dbfilename.replace(".txt", ""), TableReader.readTable(dbfilename));
+    }
 
-        // Verifica que no haya error al abrir el archivo
-        try {
-            tableReader.readTable("Employees.txt");
-            employees = tableReader.getEmployees(); // Paso 1: Selecciona la tabla completa
+    // Operación FROM
+    // Selecciona y retorna la tabla con el nombre especificado en el argumento
+    // Este es el primer paso en cualquier consulta
+    public Table from(String dbname) {
+        return db.getTable(dbname);
+    }
+
+    // Operación Específica de WHERE
+    // "salary BETWEEN minsalary AND maxsalary"
+    // Selecciona todas las tuplas de la tabla en el argumento que contengan un salario
+    // dentro de los límites especificados en los argumentos.
+    // Para encadenar acciones, se llama a la función "from()" en el parámetro "table"
+    public Table between(Table table, int minsalary, int maxsalary) {
+        Table result = new Table();
+
+        // En caso de que no se haya podido leer la tabla
+        if (table == null) {
+            return null;
         }
-        catch (Exception e) {
-            // En caso de ocurrir algún error, termina la ejecución
-            e.printStackTrace();
-            System.exit(-1);
-        }
 
-        // Proceso de selección y proyección
-        // Se busca que el salario esté dentro del intervalo (selección)
-        for (Employee employee : employees) {
-            if (employee.getSalaryAsInt() >= minsalary && employee.getSalaryAsInt() <= maxsalary) {
-                selectionTable.add(employee); // Paso 2: Selección (Operación del Álgebra Relacional)
+        // Itera sobre todas las tuplas de la tabla
+        for (int i = 0; i < table.cardinality(); i++) {
+            LinkedHashMap<String, String> tuple = table.getTuple(i);
+            int salary = Integer.parseInt(tuple.get("salary").trim());
+            if (salary > minsalary && salary < maxsalary) {
+                for (String attribute : table.getAttributeNames()) {
+                    result.addValueTo(attribute, tuple.get(attribute));
+                }
             }
         }
 
-        // Se obtienen únicamente las columsnas solicitadas (proyección)
-        for (Employee employee : selectionTable) {
-            projectionTable.add(employee.select()); // Paso 3: Proyección (Operación del Álgebra Relacional)
-        }
+        return result;
     }
 
-    // Devuelve la tabla completa, en forma de cadena de texto, para ser desplegada en pantalla
-    public String getEmployees() {
-        StringBuilder employeeTable = new StringBuilder();
-        for (Employee employee : employees) {
-            employeeTable.append(employee.toString() + "\n");
-        }
-        return employeeTable.toString();
-    }
+    // Operación SELECT
+    // Realiza la proyección sobre la tabla indicada en el argumento
+    // Los atributos a mostrar se especifican en un ArrayList de String
+    // Para encadenar acciones, se llama a la función "from()" o "between()" en el parámetro "table"
+    public Table select(Table table, ArrayList<String> attributes) {
+        Table result = new Table();
 
-    // Devuelve la tabla luego de la selección, en forma de cadena de texto, para ser desplegada en pantalla
-    public String getSelectionTable() {
-        StringBuilder selectedTable = new StringBuilder();
-        for (Employee employee : selectionTable) {
-            selectedTable.append(employee.toString() + "\n");
+        for (String attribute : attributes) {
+            for (String value : table.getAttributeValues(attribute)) {
+                result.addValueTo(attribute, value);
+            }
         }
-        return selectedTable.toString();
-    }
 
-    // Devuelve la tabla luego de la proyección en la selección, en forma de cadena de texto, para ser desplegada en pantalla
-    public String getProjectionTable() {
-        StringBuilder projectedTable = new StringBuilder();
-        for (String projection : projectionTable) {
-            projectedTable.append(projection + "\n");
-        }
-        return projectedTable.toString();
+        return result;
     }
 }
