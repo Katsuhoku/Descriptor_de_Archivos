@@ -49,7 +49,7 @@ public class TableReader {
         int numAtributes = (int) fileDescriptor.length / 3; // Total de atributos
 
         String line = null;
-        Table newTable = new Table();
+        Table newTable = new Table(filename.replace(".txt", ""));
         while ((line = file.readLine()) != null) {
             for (int i = 0; i < numAtributes; i++) {
                 // Límites para cortar la cadena de la tupla (obtenidos del descriptor)

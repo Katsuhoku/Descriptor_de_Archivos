@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import javax.management.AttributeNotFoundException;
+
 public class Query {
     // Base de Datos
     private Database db;
@@ -56,7 +58,7 @@ public class Query {
     // atributo en la nueva tabla. El nombre  de cada atributo en la nueva tabla se 
     // transforma en "idx.attribute_name"
     public Table product(Table table1, String id1, Table table2, String id2) {
-        Table productTable = new Table();
+        Table productTable = new Table("Product Result");
 
         for (int i = 0; i < table1.cardinality(); i++) {
             // Obtiene la i-ésima tupla de la tabla 1
@@ -80,13 +82,8 @@ public class Query {
     }
 
     // Operación específica de WHERE: EQUALS
-    // "employees.department_id = departments.deparment_id"
-    // Seleciona todas las tupals de la tabla en el argumento en las que
-    // el identificador del departamento procedente de la tabla
-    // EMPLOYEES sea igual al identificador del deparamento procedente de la
-    // tabla DEPARTMENTS
-    public Table equals(Table table, String fromEmp_deptoID, String fromDeptos_deptoID) {
-        Table result = new Table();
+    public Table equals(Table table, String attribute1, String attribute2) throws AttributeNotFoundException {
+        Table result = new Table("Equals Result");
 
         // Encaso de que no se haya podido leer la tabla
         if (table == null) {
@@ -97,7 +94,22 @@ public class Query {
         for (int i = 0; i < table.cardinality(); i++) {
             LinkedHashMap<String, String> tuple = table.getTuple(i);
             // Compara ambos atributos
-            if (tuple.get(fromEmp_deptoID).trim() == tuple.get(fromDeptos_deptoID).trim()) {
+            String value1 = null;
+            String value2 = null;
+
+            try {
+                value1 = tuple.get(attribute1).trim();
+            } catch (NullPointerException npe) {
+                throw new AttributeNotFoundException("\"" + attribute1 + "\" no se reconoce como un atributo para la tabla \"" + table.getName() + "\"");
+            }
+            
+            try {
+                value2 = tuple.get(attribute2).trim();
+            } catch (NullPointerException npe) {
+                throw new AttributeNotFoundException("\"" + attribute2 + "\" no se reconoce como un atributo para la tabla \"" + table.getName() + "\"");
+            }
+
+            if (value1.equals(value2)) {
                 for (String attribute : table.getAttributeNames()) {
                     result.addValueTo(attribute, tuple.get(attribute));
                 }
@@ -115,7 +127,7 @@ public class Query {
     // dentro de los límites especificados en los argumentos.
     // Para encadenar acciones, se llama a la función "from()" en el parámetro "table"
     public Table between(Table table, int minsalary, int maxsalary) {
-        Table result = new Table();
+        Table result = new Table("Between Result");
 
         // En caso de que no se haya podido leer la tabla
         if (table == null) {
@@ -140,12 +152,16 @@ public class Query {
     // Realiza la proyección sobre la tabla indicada en el argumento
     // Los atributos a mostrar se especifican en un ArrayList de String
     // Para encadenar acciones, se llama a la función "from()" o "between()" en el parámetro "table"
-    public Table select(Table table, ArrayList<String> attributes) {
-        Table result = new Table();
+    public Table select(Table table, ArrayList<String> attributes) throws AttributeNotFoundException {
+        Table result = new Table("Select Result");
 
         for (String attribute : attributes) {
-            for (String value : table.getAttributeValues(attribute)) {
-                result.addValueTo(attribute, value);
+            try {
+                for (String value : table.getAttributeValues(attribute)) {
+                    result.addValueTo(attribute, value);
+                }
+            } catch (NullPointerException npe) {
+                throw new AttributeNotFoundException("\"" + attribute + "\" no se reconoce como un atributo para la tabla \"" + table.getName() + "\"");
             }
         }
 

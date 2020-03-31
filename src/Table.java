@@ -42,14 +42,18 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class Table {
+    // Nombre de la tabla
+    private String name;
     // Tabla hash que representa toda la tabla, String es la clave y ArrayList<String> son los valores para esa clave
     private LinkedHashMap<String, ArrayList<String>> data;
     // Tabla hash que almacena el tamaño de columna para cada tipo de dato (para presentación)
     private LinkedHashMap<String, Integer> sizes;
 
-    public Table() {
+    public Table(String name) {
         data = new LinkedHashMap<>();
         sizes = new LinkedHashMap<>();
+
+        this.name = name;
     }
 
     /* 
@@ -71,8 +75,12 @@ public class Table {
     }
 
     // Esta función retorna la lista de valores para un determinado atributo (attribute)
-    public ArrayList<String> getAttributeValues(String attribute) {
-        return data.get(attribute);
+    public ArrayList<String> getAttributeValues(String attribute) throws NullPointerException {
+        ArrayList<String> values = data.get(attribute);
+
+        if (values == null) throw new NullPointerException();
+
+        return values;
     }
 
     // Esta función retorna una tupla de la lista disponible para consultar valor por valor a través del nombre del atributo.
@@ -98,6 +106,11 @@ public class Table {
     // (NOTA: Únicamente para iterar sobre él)
     public Set<String> getAttributeNames() {
         return data.keySet();
+    }
+
+    // Retorna el nombre de la tabla
+    public String getName() {
+        return name;
     }
 
 
@@ -137,23 +150,6 @@ public class Table {
         StringBuilder header = new StringBuilder();
         header.append(" | ");
         for (String attribute : data.keySet()) {
-            for (int i = 0; i < sizes.get(attribute) - attribute.length(); i++) header.append(" ");
-            
-            header.append(attribute + " | ");
-        }
-        StringBuilder lines = new StringBuilder();
-        for (int i = 0; i < header.length(); i++) lines.append("-");
-
-        return lines.toString() + "\n" + header.toString() + "\n" + lines.toString();
-    }
-
-    // Esta función regresa una "cabecera" con los nombres de los atributos especificados en el ArrayList
-    // (Header para una proyección)
-    // Los nombres de los atributos se separan según el tamaño máximo del tipo de dato
-    public String header(ArrayList<String> attributes) {
-        StringBuilder header = new StringBuilder();
-        header.append(" | ");
-        for (String attribute : attributes) {
             for (int i = 0; i < sizes.get(attribute) - attribute.length(); i++) header.append(" ");
             
             header.append(attribute + " | ");
