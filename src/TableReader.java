@@ -8,11 +8,7 @@
     de una tabla de una base de datos.
 
     Equipo:
-    Baéz González José, 201657079
-    Bautista Otero Alexandra, 201640295
     Coria Rios Marco Antonio, 201734576
-    Hernández Ramos Ángel, 201653224
-    Torres Pérez Daniel, 201733939
 
     Clase: TableReader
     Descripción: Esta clase se encarga de leer el archivo de la tabla, el cual debe incluir

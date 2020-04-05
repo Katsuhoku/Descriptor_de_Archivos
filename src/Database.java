@@ -8,11 +8,7 @@
     de una tabla de una base de datos.
 
     Equipo:
-    Baéz González José, 201657079
-    Bautista Otero Alexandra, 201640295
     Coria Rios Marco Antonio, 201734576
-    Hernández Ramos Ángel, 201653224
-    Torres Pérez Daniel, 201733939
 
     Clase: Database
     Descripción: Esta clase representa toda una Base de Datos, es decir, un conjunto

@@ -8,11 +8,7 @@
     de una tabla de una base de datos.
 
     Equipo:
-    Baéz González José, 201657079
-    Bautista Otero Alexandra, 201640295
     Coria Rios Marco Antonio, 201734576
-    Hernández Ramos Ángel, 201653224
-    Torres Pérez Daniel, 201733939
 
     Clase: Query
     Descripción: Clase encargada de procesar la consulta con los parámetros del usuario.
@@ -26,8 +22,6 @@ package src;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-
-import javax.management.AttributeNotFoundException;
 
 public class Query {
     // Base de Datos
@@ -100,13 +94,13 @@ public class Query {
             try {
                 value1 = tuple.get(attribute1).trim();
             } catch (NullPointerException npe) {
-                throw new AttributeNotFoundException("\"" + attribute1 + "\" no se reconoce como un atributo para la tabla \"" + table.getName() + "\"");
+                throw new AttributeNotFoundException("\"" + attribute1 + "\" no se reconoce como un atributo para la tabla \"" + table.getName() + "\"", attribute1);
             }
             
             try {
                 value2 = tuple.get(attribute2).trim();
             } catch (NullPointerException npe) {
-                throw new AttributeNotFoundException("\"" + attribute2 + "\" no se reconoce como un atributo para la tabla \"" + table.getName() + "\"");
+                throw new AttributeNotFoundException("\"" + attribute2 + "\" no se reconoce como un atributo para la tabla \"" + table.getName() + "\"", attribute2);
             }
 
             if (value1.equals(value2)) {
@@ -161,7 +155,7 @@ public class Query {
                     result.addValueTo(attribute, value);
                 }
             } catch (NullPointerException npe) {
-                throw new AttributeNotFoundException("\"" + attribute + "\" no se reconoce como un atributo para la tabla \"" + table.getName() + "\"");
+                throw new AttributeNotFoundException("\"" + attribute + "\" no se reconoce como un atributo para la tabla \"" + table.getName() + "\"", attribute);
             }
         }
 
