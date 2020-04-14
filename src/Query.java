@@ -65,7 +65,7 @@ public class Query {
         for (int i = 0; i < table.cardinality(); i++) {
             LinkedHashMap<String, String> tuple = table.getTuple(i);
             int salary = Integer.parseInt(tuple.get("salary").trim());
-            if (salary > minsalary && salary < maxsalary) {
+            if (salary >= minsalary && salary <= maxsalary) {
                 for (String attribute : table.getAttributeNames()) {
                     result.addValueTo(attribute, tuple.get(attribute));
                 }
