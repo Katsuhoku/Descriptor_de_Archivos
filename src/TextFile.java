@@ -8,11 +8,9 @@
     de una tabla de una base de datos.
 
     Equipo:
-    Baéz González José, 201657079
-    Bautista Otero Alexandra, 201640295
-    Coria Rios Marco Antonio, 201734576
-    Hernández Ramos Ángel, 201653224
-    Torres Pérez Daniel, 201733939
+    Arizmendi Ramírez Esiel Kevin, 201727950
+    Coria Rios Marco Antonio,201737811
+    Ruiz Lozano Paulo Cesar, 201734576
 
     Clase: TextFile
     Descripción: Clase encargada de abrir y leer un archivo de texto cualquiera.
